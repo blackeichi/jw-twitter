@@ -1,5 +1,4 @@
 import {
-  faGit,
   faGithub,
   faGoogle,
   faTwitter,
@@ -7,7 +6,9 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { firebaseInstance } from "../fbase";
+import { authService, firebaseInstance } from "../fbase";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { motion } from "framer-motion";
 
 const BackGR = styled.div`
   width: 100%;
@@ -51,7 +52,7 @@ const SocialLoginText = styled.h1`
   font-size: 15px;
   color: darkgray;
 `;
-const InputBox = styled.div`
+const InputBox = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -59,7 +60,7 @@ const InputBox = styled.div`
   width: 300px;
   border-top: 2px solid rgba(0, 0, 0, 0.1);
   position: relative;
-  padding: 20px 0;
+  padding-top: 20px;
   gap: 22px;
 `;
 const InputBox_Text = styled.h1`
@@ -73,14 +74,13 @@ const InputBox_Text = styled.h1`
 `;
 const InputBox_Input = styled.input`
   width: 100%;
-  height: 60px;
+  height: 50px;
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.1);
   padding: 0 8px;
   box-sizing: border-box;
   font-size: 17px;
   font-weight: 600;
-
   ::placeholder {
     color: darkgray;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -90,7 +90,7 @@ const InputBox_btn = styled.button`
   border: none;
   background-color: ${(props) => (props.isBlack ? "#272c30" : "white")};
   color: ${(props) => (props.isBlack ? "white" : "#272c30")};
-  width: 100%;
+  width: 300px;
   padding: 5px 0;
   border-radius: 20px;
   cursor: pointer;
@@ -104,7 +104,27 @@ const JoinBtn = styled.div``;
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState("");
   const onSocialLogin = async () => {};
+  const onChange = (event) => {
+    const {
+      target: { name, value },
+    } = event;
+    if (name === "email") {
+      setEmail(value);
+    } else if (name === "password") {
+      setPassword(value);
+    }
+  };
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      await signInWithEmailAndPassword(authService, email, password);
+    } catch (error) {
+      setErrors(error);
+      console.log(error);
+    }
+  };
   return (
     <BackGR>
       <Formbox>
@@ -118,12 +138,24 @@ const Auth = () => {
           <FontAwesomeIcon icon={faGithub} color={"black"} size="lg" />
           <SocialLoginText>GitHub 계정으로 계속하기</SocialLoginText>
         </SocialLogin>
-        <InputBox>
+        <InputBox onSubmit={onSubmit}>
           <InputBox_Text>또는</InputBox_Text>
-          <InputBox_Input placeholder="이메일 주소"></InputBox_Input>
-          <InputBox_btn isBlack={true}>다음</InputBox_btn>
-          <InputBox_btn isBlack={false}>비밀번호를 잊으셨나요?</InputBox_btn>
+          <InputBox_Input
+            name="email"
+            type="email"
+            required
+            placeholder="이메일 주소"
+            onChange={onChange}
+          ></InputBox_Input>
+          <InputBox_Input
+            name="password"
+            type="password"
+            required
+            placeholder="비밀번호"
+          ></InputBox_Input>
+          <InputBox_btn isBlack={true}>로그인</InputBox_btn>
         </InputBox>
+        <InputBox_btn isBlack={false}>비밀번호를 잊으셨나요?</InputBox_btn>
         <JoinBtn></JoinBtn>
       </Formbox>
     </BackGR>
