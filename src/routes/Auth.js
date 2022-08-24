@@ -7,10 +7,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { authService, firebaseInstance } from "../fbase";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
-const BackGR = styled.div`
+export const BackGR = styled.div`
   width: 100%;
   height: 100%;
   padding: 10px 0;
@@ -30,13 +35,14 @@ export const Formbox = styled.div`
   padding-top: 20px;
   border-radius: 20px;
   gap: 22px;
+  box-sizing: border-box;
 `;
-const Formtitle = styled.h1`
+export const Formtitle = styled.h1`
   font-size: 31px;
   font-weight: 800;
   margin: 8px 0;
 `;
-const SocialLogin = styled.div`
+const SocialLogin = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: 10px;
@@ -50,7 +56,7 @@ const SocialLogin = styled.div`
 const SocialLoginText = styled.h1`
   font-weight: 600;
   font-size: 15px;
-  color: darkgray;
+  color: rgba(0, 0, 0, 0.6);
 `;
 const InputBox = styled.form`
   display: flex;
@@ -72,7 +78,7 @@ const InputBox_Text = styled.h1`
   padding: 10px;
   top: -20px;
 `;
-const InputBox_Input = styled.input`
+export const InputBox_Input = styled.input`
   width: 100%;
   height: 50px;
   border-radius: 4px;
@@ -86,7 +92,13 @@ const InputBox_Input = styled.input`
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   }
 `;
-const InputBox_btn = styled.button`
+export const ErrorMsg = styled.h1`
+  position: absolute;
+  bottom: -23px;
+  font-size: 11px;
+  color: red;
+`;
+export const InputBox_btn = styled.button`
   border: none;
   background-color: ${(props) => (props.isBlack ? "#272c30" : "white")};
   color: ${(props) => (props.isBlack ? "white" : "#272c30")};
@@ -98,14 +110,22 @@ const InputBox_btn = styled.button`
   font-size: 15px;
   box-sizing: border-box;
   border: 2px solid rgba(0, 0, 0, 0.1);
+  :nth-child(1) {
+    margin-top: 10px;
+  }
 `;
-const JoinBtn = styled.div``;
+
+const BtnHover = {
+  hover: {
+    backgroundColor: "rgba(0,0,0,0.1)",
+  },
+};
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState("");
-  const onSocialLogin = async () => {};
+
   const onChange = (event) => {
     const {
       target: { name, value },
@@ -116,25 +136,47 @@ const Auth = () => {
       setPassword(value);
     }
   };
+  const onSocialLogin = async (event) => {
+    const name = event.currentTarget.getAttribute("name");
+    let provider;
+    if (name === "Google") {
+      provider = new firebaseInstance.auth.GoogleAuthProvider();
+    } else if (name === "Git") {
+      provider = new firebaseInstance.auth.GithubAuthProvider();
+    }
+    await authService.signInWithPopup(provider);
+  };
   const onSubmit = async (event) => {
     event.preventDefault();
+    const auth = getAuth();
+    let data;
     try {
-      await signInWithEmailAndPassword(authService, email, password);
+      data = await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      setErrors(error);
-      console.log(error);
+      setErrors("로그인할 수 없습니다. 이메일/비밀번호를 확인해주세요.");
     }
+    console.log(data);
   };
   return (
     <BackGR>
       <Formbox>
         <FontAwesomeIcon icon={faTwitter} color={"#1D9BF0"} size="2x" />
         <Formtitle>트위터에 로그인하기</Formtitle>
-        <SocialLogin>
+        <SocialLogin
+          onClick={onSocialLogin}
+          name="Google"
+          variants={BtnHover}
+          whileHover="hover"
+        >
           <FontAwesomeIcon icon={faGoogle} color={"red"} size="lg" />
           <SocialLoginText>Google 계정으로 계속하기</SocialLoginText>
         </SocialLogin>
-        <SocialLogin>
+        <SocialLogin
+          onClick={onSocialLogin}
+          name="Git"
+          variants={BtnHover}
+          whileHover="hover"
+        >
           <FontAwesomeIcon icon={faGithub} color={"black"} size="lg" />
           <SocialLoginText>GitHub 계정으로 계속하기</SocialLoginText>
         </SocialLogin>
@@ -152,11 +194,14 @@ const Auth = () => {
             type="password"
             required
             placeholder="비밀번호"
+            onChange={onChange}
           ></InputBox_Input>
           <InputBox_btn isBlack={true}>로그인</InputBox_btn>
+          <ErrorMsg>{errors}</ErrorMsg>
         </InputBox>
-        <InputBox_btn isBlack={false}>비밀번호를 잊으셨나요?</InputBox_btn>
-        <JoinBtn></JoinBtn>
+        <Link to="/join">
+          <InputBox_btn isBlack={false}>회원가입</InputBox_btn>
+        </Link>
       </Formbox>
     </BackGR>
   );
