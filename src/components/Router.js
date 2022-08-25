@@ -7,14 +7,14 @@ import Join from "../routes/Join";
 import Profile from "../routes/Profile";
 import Navigations from "./Navigations";
 
-const AppRouter = ({ isLoggedIn }) => {
+const AppRouter = ({ isLoggedIn, userObj }) => {
   return (
     <HashRouter>
       {isLoggedIn ? <Navigations /> : null}
       <Routes>
         {isLoggedIn ? (
           <>
-            <Route exact path="/" element={<Home />}></Route>
+            <Route exact path="/" element={<Home userObj={userObj} />}></Route>
             <Route exact path="/Profile" element={<Profile />}></Route>
           </>
         ) : (
