@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const Navigations = () => {
+const Navigations = ({ userObj }) => {
   return (
     <nav>
       <ul>
@@ -9,7 +9,9 @@ const Navigations = () => {
           <Link to="/">Home</Link>
         </li>
         <li>
-          <Link to="/profile">Profile</Link>
+          <Link to="/profile">
+            {userObj.displayName ? userObj.displayName : "Profile"}
+          </Link>
         </li>
       </ul>
     </nav>
