@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
+import { RecoilRoot } from "recoil";
 import { authService } from "../fbase";
 import AppRouter from "./Router";
 
@@ -25,7 +26,7 @@ function App() {
     setInit(true);
   };
   return (
-    <>
+    <RecoilRoot>
       {init ? (
         <AppRouter
           isLoggedIn={isLoggedIn}
@@ -35,7 +36,7 @@ function App() {
       ) : (
         "Initializing..."
       )}
-    </>
+    </RecoilRoot>
   );
 }
 
