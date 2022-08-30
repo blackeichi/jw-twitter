@@ -3,9 +3,7 @@ import Tweet from "../components/Tweet";
 import { dbService, storageService } from "../fbase";
 import { v4 as uuidv4 } from "uuid";
 import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { darkState } from "../atom";
 
 const HomeBox = styled.div`
@@ -13,30 +11,17 @@ const HomeBox = styled.div`
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  background-color: ${(props) => console.log(props.dark)};
+  background-color: ${(props) => (props.dark ? "black" : "white")};
 `;
 const Wrapper = styled.div`
+  margin-top: 150px;
   width: 570px;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
 `;
-const ToggleThemeBtn = styled.div`
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  font-size: 20px;
-  color: white;
-  background-color: #22b2da;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-`;
+
 const HomeForm = styled.form``;
 const HomeTextInput = styled.input``;
 const HomeFileInput = styled.input``;
@@ -46,8 +31,7 @@ const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
   const [attachment, setAttachment] = useState(null);
-  const [dark, setDark] = useRecoilState(darkState);
-
+  const dark = useRecoilValue(darkState);
   const getTweets = async () => {
     await dbService.collection("tweets").onSnapshot((snapshot) => {
       const tweetArray = snapshot.docs.map((doc) => ({
@@ -95,24 +79,14 @@ const Home = ({ userObj }) => {
     };
     reader.readAsDataURL(theFile);
   };
-  const onClick = () => {
-    setDark((prev) => !prev);
-  };
-  console.log(dark);
+
   useEffect(() => {
     getTweets();
   }, [dark]);
   return (
-    <HomeBox>
+    <HomeBox dark={dark}>
       <Wrapper>
-        <ToggleThemeBtn onClick={onClick}>
-          {!dark ? (
-            <FontAwesomeIcon icon={faMoon} />
-          ) : (
-            <FontAwesomeIcon icon={faSun} />
-          )}
-        </ToggleThemeBtn>
-        <HomeForm dark={dark} onSubmit={onSubmit}>
+        <HomeForm onSubmit={onSubmit}>
           <HomeTextInput
             value={tweet}
             onChange={onChange}
