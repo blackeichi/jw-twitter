@@ -32,7 +32,6 @@ const Profile = ({ userObj, refreshUser }) => {
       .where("creatorId", "==", `${userObj.uid}`)
       .orderBy("createdAt")
       .get();
-    console.log(tweets.docs.map((doc) => doc.data()));
   };
   useEffect(() => {
     getMyTweets();

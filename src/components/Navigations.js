@@ -1,3 +1,4 @@
+import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import {
   faHome,
   faMoon,
@@ -6,7 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { darkState } from "../atom";
@@ -14,6 +15,7 @@ import { darkState } from "../atom";
 const Ul = styled.ul`
   position: fixed;
   display: flex;
+  align-items: center;
   width: 100%;
   justify-content: center;
   padding: 40px 0;
@@ -21,11 +23,10 @@ const Ul = styled.ul`
 `;
 
 const IconBtn = styled.div`
-  font-size: 20px;
-  color: white;
-  background-color: #22b2da;
-  width: 40px;
-  height: 40px;
+  font-size: 22px;
+  color: #22b2da;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -35,6 +36,7 @@ const IconBtn = styled.div`
 
 const Navigations = ({ userObj }) => {
   const [dark, setDark] = useRecoilState(darkState);
+  const location = useLocation();
   const onClick = () => {
     setDark((prev) => !prev);
   };
@@ -44,14 +46,26 @@ const Navigations = ({ userObj }) => {
       <Ul>
         <li>
           <Link to="/">
-            <IconBtn>
-              <FontAwesomeIcon icon={faHome} />
+            <IconBtn
+              style={
+                location.pathname === "/"
+                  ? { backgroundColor: "#22b2da", color: "white" }
+                  : {}
+              }
+            >
+              <FontAwesomeIcon icon={faTwitter} />
             </IconBtn>
           </Link>
         </li>
         <li>
           <Link to="/profile">
-            <IconBtn>
+            <IconBtn
+              style={
+                location.pathname === "/profile"
+                  ? { backgroundColor: "#22b2da", color: "white" }
+                  : {}
+              }
+            >
               <FontAwesomeIcon icon={faUser} />
             </IconBtn>
           </Link>

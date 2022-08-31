@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import styled from "styled-components";
 import { useRecoilValue } from "recoil";
 import { darkState } from "../atom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUp, faUpload } from "@fortawesome/free-solid-svg-icons";
 
 const HomeBox = styled.div`
   width: 100%;
@@ -19,18 +21,59 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
 `;
 
-const HomeForm = styled.form``;
-const HomeTextInput = styled.input``;
-const HomeFileInput = styled.input``;
-const HomeBtn = styled.input``;
+const HomeForm = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
+const HomeInputBox = styled.div`
+  position: relative;
+  width: 280px;
+`;
+const HomeTextInput = styled.input`
+  width: 280px;
+  height: 50px;
+  outline: none;
+  box-sizing: border-box;
+  border: 1px solid #22b2da;
+  padding: 10px 20px;
+  padding-right: 60px;
+  border-radius: 30px;
+  color: ${(props) => (props.dark ? "white" : "black")};
+  background-color: transparent;
+`;
+const HomeBtn = styled.input`
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  font-size: 25px;
+  border-radius: 50%;
+  right: 0;
+  background-color: #22b2da;
+  color: white;
+  border: none;
+`;
+const HomeFileInput = styled.input`
+  display: none;
+`;
+const FileInputLabel = styled.label`
+  color: #22b2da;
+  font-size: 12px;
+`;
+const FileInputBox = styled.div`
+  box-sizing: border-box;
+  width: 280px;
+  display: flex;
+  justify-content: center;
+  padding: 25px 0;
+  gap: 10px;
+`;
 
 const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
-  const [attachment, setAttachment] = useState(null);
+  const [attachment, setAttachment] = useState("");
   const dark = useRecoilValue(darkState);
   const getTweets = async () => {
     await dbService.collection("tweets").onSnapshot((snapshot) => {
@@ -87,19 +130,30 @@ const Home = ({ userObj }) => {
     <HomeBox dark={dark}>
       <Wrapper>
         <HomeForm onSubmit={onSubmit}>
-          <HomeTextInput
-            value={tweet}
-            onChange={onChange}
-            type="text"
-            placeholder="Write...."
-            maxLength={100}
-          ></HomeTextInput>
+          <HomeInputBox>
+            <HomeTextInput
+              dark={dark}
+              value={tweet}
+              onChange={onChange}
+              type="text"
+              placeholder="Write...."
+              maxLength={100}
+            ></HomeTextInput>
+
+            <HomeBtn type="submit" value="+"></HomeBtn>
+          </HomeInputBox>
+          <FileInputLabel dark={dark} for="inputImage">
+            <FileInputBox>
+              <h1>Add photos</h1>
+              <FontAwesomeIcon icon={faUpload} />
+            </FileInputBox>
+          </FileInputLabel>
           <HomeFileInput
+            id="inputImage"
             type="file"
             accept="image/*"
             onChange={onFileChange}
           ></HomeFileInput>
-          <HomeBtn type="submit" value="Tweet"></HomeBtn>
           {attachment && (
             <div>
               <img src={attachment} width="50px" height="50px" />
