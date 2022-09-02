@@ -6,26 +6,35 @@ import styled from "styled-components";
 import { useRecoilValue } from "recoil";
 import { darkState } from "../atom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
 
-const HomeBox = styled.div`
+export const HomeBox = styled.div`
   width: 100%;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   background-color: ${(props) => (props.dark ? "black" : "white")};
 `;
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   margin-top: 150px;
-  width: 570px;
+  width: 280px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 20px;
+  border-bottom: ${(props) =>
+    props.border
+      ? props.dark
+        ? "1px solid white"
+        : "1px solid black"
+      : "none"};
 `;
 
 const HomeForm = styled.form`
   display: flex;
   flex-direction: column;
+  align-items: center;
 `;
 const HomeInputBox = styled.div`
   position: relative;
@@ -53,6 +62,7 @@ const HomeBtn = styled.input`
   background-color: #22b2da;
   color: white;
   border: none;
+  cursor: pointer;
 `;
 const HomeFileInput = styled.input`
   display: none;
@@ -60,14 +70,37 @@ const HomeFileInput = styled.input`
 const FileInputLabel = styled.label`
   color: #22b2da;
   font-size: 12px;
+  width: 260px;
+  border-bottom: 2px dotted #22b2da;
+  margin-bottom: 10px;
 `;
 const FileInputBox = styled.div`
   box-sizing: border-box;
-  width: 280px;
+  width: 260px;
   display: flex;
   justify-content: center;
   padding: 25px 0;
   gap: 10px;
+`;
+const PreviewBox = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  box-sizing: border-box;
+`;
+const PreviewImg = styled.img`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid white;
+`;
+
+const ClearImg = styled.div`
+  font-size: 15px;
+  color: #22b2da;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 1;
 `;
 
 const Home = ({ userObj }) => {
@@ -122,13 +155,13 @@ const Home = ({ userObj }) => {
     };
     reader.readAsDataURL(theFile);
   };
-
+  const ClearImage = () => setAttachment("");
   useEffect(() => {
     getTweets();
   }, [dark]);
   return (
     <HomeBox dark={dark}>
-      <Wrapper>
+      <Wrapper border={false}>
         <HomeForm onSubmit={onSubmit}>
           <HomeInputBox>
             <HomeTextInput
@@ -139,14 +172,20 @@ const Home = ({ userObj }) => {
               placeholder="Write...."
               maxLength={100}
             ></HomeTextInput>
-
             <HomeBtn type="submit" value="+"></HomeBtn>
           </HomeInputBox>
-          <FileInputLabel dark={dark} for="inputImage">
-            <FileInputBox>
-              <h1>Add photos</h1>
-              <FontAwesomeIcon icon={faUpload} />
-            </FileInputBox>
+          <FileInputLabel dark={dark} htmlFor="inputImage">
+            {attachment ? (
+              <PreviewBox>
+                <PreviewImg src={attachment} />
+                <ClearImg onClick={ClearImage}>X</ClearImg>
+              </PreviewBox>
+            ) : (
+              <FileInputBox>
+                <h1>Add photos</h1>
+                <FontAwesomeIcon icon={faUpload} />
+              </FileInputBox>
+            )}
           </FileInputLabel>
           <HomeFileInput
             id="inputImage"
@@ -154,21 +193,14 @@ const Home = ({ userObj }) => {
             accept="image/*"
             onChange={onFileChange}
           ></HomeFileInput>
-          {attachment && (
-            <div>
-              <img src={attachment} width="50px" height="50px" />
-            </div>
-          )}
         </HomeForm>
-        <div>
-          {tweets.map((tweet) => (
-            <Tweet
-              key={tweet.id}
-              tweetObj={tweet}
-              isOwner={tweet.creatorId === userObj.uid}
-            />
-          ))}
-        </div>
+        {tweets.map((tweet) => (
+          <Tweet
+            key={tweet.id}
+            tweetObj={tweet}
+            isOwner={tweet.creatorId === userObj.uid}
+          />
+        ))}
       </Wrapper>
     </HomeBox>
   );
