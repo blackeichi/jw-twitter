@@ -9,7 +9,7 @@ import Navigations from "./Navigations";
 
 const AppRouter = ({ isLoggedIn, userObj, refreshUser }) => {
   return (
-    <HashRouter>
+    <HashRouter basename={process.env.PUBLIC_URL}>
       {isLoggedIn ? <Navigations userObj={userObj} /> : null}
       <Routes>
         {isLoggedIn ? (
